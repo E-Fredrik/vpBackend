@@ -1,69 +1,149 @@
 generator client {
-
   provider = "prisma-client-js"
-
   output   = "../generated/prisma"
-
 }
-
-
 
 datasource db {
-
   provider = "postgresql"
-
   url      = env("DATABASE_URL")
-
 }
 
 
+enum Gender {
+  MALE
+  FEMALE
+  UNDISCLOSED
+}
 
+enum HealthCondition {
+  HEART_CONDITION
+  RESPIRATORY_ISSUES
+  DIABETES
+  HYPERTENSION
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum PlaceCategory {
+  RESTAURANT
+  PARK
+  GYM
+  STORE
+  OTHER
+}
 model User {
-
-  id       Int    @id @default(autoincrement())
-
-  username String @db.VarChar(100)
-
-  email    String @unique @db.VarChar(150)
-
-  password String @db.VarChar(100)
-
-
-
-  todos Todo[]
-
-
+  user_id      Int                @id @default(autoincrement())
+  name         String?
+  bmiGoal      Float?
+  height       Int?
+  healthCondition HealthCondition?
+  weight       Float?
+  email        String?            @unique
+  birthDate    DateTime?
+  gender       Gender?
+  requestedFriends  Friend[]       @relation("RequesterFriends")
+  addresseeFriends  Friend[]       @relation("AddresseeFriends")
+  dailySummaries    Daily_Summary[]
+  foodLogs          Food_Log[]
+  activityRecords   Activity_Log[]
+  visitRecords      Visit_Log[]
+  emaLogs           EMA_Log[]
 
   @@map("users")
-
 }
 
+model Friend {
+  friend_id     Int          @id @default(autoincrement())
+  requester_id  Int
+  addressee_id  Int
+  status        FriendStatus @default(PENDING)
+  createdAt     DateTime     @default(now())
 
+  requester User @relation("RequesterFriends", fields: [requester_id], references: [user_id], onDelete: Cascade)
+  addressee User @relation("AddresseeFriends", fields: [addressee_id], references: [user_id], onDelete: Cascade)
 
-model Todo {
+  @@map("friends")
+}
 
-  id          Int    @id @default(autoincrement())
+model Daily_Summary {
+  summary_id       Int      @id @default(autoincrement())
+  user_id          Int
+  date             DateTime
+  totalCaloriesIn  Int
 
-  title       String @db.VarChar(100)
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  description String @db.Text
+  @@map("daily_summary")
+}
 
-  priority    String @db.VarChar(10)
+model Place_of_Interest {
+  place_id       Int     @id @default(autoincrement())
+  name           String
+  category       PlaceCategory
+  latitude       Float
+  longitude      Float
+  geofenceRadius Int
 
-  due_date    String @db.VarChar(100)
+  visitRecords Visit_Log[]
 
-  status      String @db.VarChar(20)
+  @@map("place_of_interest")
+}
 
+model Food_Log {
+  log_id    Int     @id @default(autoincrement())
+  user_id   Int
+  foodName  String
+  calories  Int
+  timestamp BigInt
+  latitude  Float?
+  longitude Float?
 
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  user_id Int
+  @@map("food_log")
+}
 
+model Activity_Log {
+  activity_id  Int    @id @default(autoincrement())
+  user_id      Int
+  activityType String
+  startTime    BigInt
+  endTime      BigInt
+  confidence   Int
 
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@map("activity_log")
+}
 
+model Visit_Log {
+  visit_id     Int    @id @default(autoincrement())
+  user_id      Int
+  place_id     Int
+  entryTime    BigInt
+  exitTime     BigInt
+  durationMins Int
 
+  user  User              @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  place Place_of_Interest @relation(fields: [place_id], references: [place_id], onDelete: Cascade)
 
-  @@map("todos")
+  @@map("visit_log")
+}
 
+model EMA_Log {
+  ema_id        Int    @id @default(autoincrement())
+  user_id       Int
+  timestamp     BigInt
+  latitude      Float
+  longitude     Float
+  geofenceRadius Int
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("ema_log")
 }
