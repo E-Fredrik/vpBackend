@@ -61,7 +61,7 @@ export class UserService {
   }
 
   static async delete(id: number): Promise<void> {
-    await this.getById(id); // Check if exists
+    await this.getById(id);
     
     await prismaClient.user.delete({
       where: { user_id: id }
