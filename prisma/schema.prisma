@@ -38,12 +38,13 @@ enum PlaceCategory {
 }
 model User {
   user_id      Int                @id @default(autoincrement())
-  name         String?
+  username     String             @unique
+  password String
   bmiGoal      Float?
   height       Int?
   healthCondition HealthCondition?
   weight       Float?
-  email        String?            @unique
+  email        String           @unique
   birthDate    DateTime?
   gender       Gender?
   requestedFriends  Friend[]       @relation("RequesterFriends")
