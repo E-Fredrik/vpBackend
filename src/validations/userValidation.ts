@@ -5,7 +5,7 @@ export class UserValidation {
         username: z.string().min(3).max(30),
         email: z.string().email(),
         password: z.string().min(6).max(100),
-        bmigoal: z.number().min(10).max(50),
+        bmiGoal: z.number().min(10).max(50),
         weight: z.number().positive(),
         height: z.number().positive(),
     })
