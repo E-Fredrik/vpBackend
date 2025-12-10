@@ -13,12 +13,13 @@ CREATE TYPE "PlaceCategory" AS ENUM ('RESTAURANT', 'PARK', 'GYM', 'STORE', 'OTHE
 -- CreateTable
 CREATE TABLE "users" (
     "user_id" SERIAL NOT NULL,
-    "name" TEXT,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "bmiGoal" DOUBLE PRECISION,
     "height" INTEGER,
     "healthCondition" "HealthCondition",
     "weight" DOUBLE PRECISION,
-    "email" TEXT,
+    "email" TEXT NOT NULL,
     "birthDate" TIMESTAMP(3),
     "gender" "Gender",
 
@@ -59,16 +60,34 @@ CREATE TABLE "place_of_interest" (
 );
 
 -- CreateTable
+CREATE TABLE "food" (
+    "food_id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "calories" INTEGER NOT NULL,
+
+    CONSTRAINT "food_pkey" PRIMARY KEY ("food_id")
+);
+
+-- CreateTable
 CREATE TABLE "food_log" (
     "log_id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "foodName" TEXT NOT NULL,
-    "calories" INTEGER NOT NULL,
     "timestamp" BIGINT NOT NULL,
     "latitude" DOUBLE PRECISION,
     "longitude" DOUBLE PRECISION,
 
     CONSTRAINT "food_log_pkey" PRIMARY KEY ("log_id")
+);
+
+-- CreateTable
+CREATE TABLE "food_log_items" (
+    "id" SERIAL NOT NULL,
+    "log_id" INTEGER NOT NULL,
+    "food_id" INTEGER NOT NULL,
+    "quantity" INTEGER,
+    "calories" INTEGER,
+
+    CONSTRAINT "food_log_items_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -108,6 +127,9 @@ CREATE TABLE "ema_log" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
@@ -121,6 +143,12 @@ ALTER TABLE "daily_summary" ADD CONSTRAINT "daily_summary_user_id_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "food_log" ADD CONSTRAINT "food_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "food_log_items" ADD CONSTRAINT "food_log_items_log_id_fkey" FOREIGN KEY ("log_id") REFERENCES "food_log"("log_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "food_log_items" ADD CONSTRAINT "food_log_items_food_id_fkey" FOREIGN KEY ("food_id") REFERENCES "food"("food_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "activity_log" ADD CONSTRAINT "activity_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;

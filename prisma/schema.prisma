@@ -38,16 +38,15 @@ enum PlaceCategory {
 }
 model User {
   user_id      Int                @id @default(autoincrement())
-  name         String?
+  username     String             @unique
+  password String
   bmiGoal      Float?
   height       Int?
   healthCondition HealthCondition?
   weight       Float?
-  email        String?            @unique
+  email        String           @unique
   birthDate    DateTime?
   gender       Gender?
-
-  // Relations
   requestedFriends  Friend[]       @relation("RequesterFriends")
   addresseeFriends  Friend[]       @relation("AddresseeFriends")
   dailySummaries    Daily_Summary[]
@@ -56,7 +55,6 @@ model User {
   visitRecords      Visit_Log[]
   emaLogs           EMA_Log[]
 
-  @@index([email])
   @@map("users")
 }
 
@@ -70,10 +68,6 @@ model Friend {
   requester User @relation("RequesterFriends", fields: [requester_id], references: [user_id], onDelete: Cascade)
   addressee User @relation("AddresseeFriends", fields: [addressee_id], references: [user_id], onDelete: Cascade)
 
- @@unique([requester_id, addressee_id])
-  @@index([requester_id])
-  @@index([addressee_id])
-  @@index([status])
   @@map("friends")
 }
 
@@ -85,9 +79,6 @@ model Daily_Summary {
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-@@unique([user_id, date])
-  @@index([user_id])
-  @@index([date])
   @@map("daily_summary")
 }
 
@@ -101,26 +92,46 @@ model Place_of_Interest {
 
   visitRecords Visit_Log[]
 
-@@index([category])
-  @@index([latitude, longitude])
   @@map("place_of_interest")
 }
+
+model Food {
+  food_id   Int    @id @default(autoincrement())
+  name      String
+  calories  Int
+
+  foodInLogs FoodInLog[]
+
+  @@map("food")
+}
+
 
 model Food_Log {
   log_id    Int     @id @default(autoincrement())
   user_id   Int
-  foodName  String
-  calories  Int
   timestamp BigInt
   latitude  Float?
   longitude Float?
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  @@index([user_id])
-  @@index([timestamp])
-  @@index([user_id, timestamp])
+
+  foodInLogs FoodInLog[]
+
   @@map("food_log")
+}
+
+model FoodInLog {
+  id       Int @id @default(autoincrement())
+  log_id   Int
+  food_id  Int
+  quantity Int?   
+  calories Int?    
+
+  log  Food_Log @relation(fields: [log_id], references: [log_id], onDelete: Cascade)
+  food Food     @relation(fields: [food_id], references: [food_id], onDelete: Cascade)
+
+  @@map("food_log_items")
 }
 
 model Activity_Log {
@@ -132,11 +143,7 @@ model Activity_Log {
   confidence   Int
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  
-  @@index([user_id])
-  @@index([activityType])
-  @@index([startTime])
-  @@index([user_id, startTime])
+
   @@map("activity_log")
 }
 
@@ -151,10 +158,6 @@ model Visit_Log {
   user  User              @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   place Place_of_Interest @relation(fields: [place_id], references: [place_id], onDelete: Cascade)
 
-  @@index([user_id])
-  @@index([place_id])
-  @@index([entryTime])
-  @@index([user_id, entryTime]) 
   @@map("visit_log")
 }
 
@@ -168,9 +171,5 @@ model EMA_Log {
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  @@index([user_id])
-  @@index([timestamp])
-  @@index([user_id, timestamp])
-  @@index([latitude, longitude])
   @@map("ema_log")
 }
