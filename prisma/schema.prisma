@@ -47,6 +47,8 @@ model User {
   email        String           @unique
   birthDate    DateTime?
   gender       Gender?
+
+  // Relations
   requestedFriends  Friend[]       @relation("RequesterFriends")
   addresseeFriends  Friend[]       @relation("AddresseeFriends")
   dailySummaries    Daily_Summary[]
@@ -55,6 +57,7 @@ model User {
   visitRecords      Visit_Log[]
   emaLogs           EMA_Log[]
 
+  @@index([email])
   @@map("users")
 }
 
@@ -68,6 +71,10 @@ model Friend {
   requester User @relation("RequesterFriends", fields: [requester_id], references: [user_id], onDelete: Cascade)
   addressee User @relation("AddresseeFriends", fields: [addressee_id], references: [user_id], onDelete: Cascade)
 
+ @@unique([requester_id, addressee_id])
+  @@index([requester_id])
+  @@index([addressee_id])
+  @@index([status])
   @@map("friends")
 }
 
@@ -79,6 +86,9 @@ model Daily_Summary {
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
+@@unique([user_id, date])
+  @@index([user_id])
+  @@index([date])
   @@map("daily_summary")
 }
 
@@ -92,6 +102,8 @@ model Place_of_Interest {
 
   visitRecords Visit_Log[]
 
+@@index([category])
+  @@index([latitude, longitude])
   @@map("place_of_interest")
 }
 
@@ -106,6 +118,9 @@ model Food_Log {
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
+  @@index([user_id])
+  @@index([timestamp])
+  @@index([user_id, timestamp])
   @@map("food_log")
 }
 
@@ -118,7 +133,11 @@ model Activity_Log {
   confidence   Int
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-
+  
+  @@index([user_id])
+  @@index([activityType])
+  @@index([startTime])
+  @@index([user_id, startTime])
   @@map("activity_log")
 }
 
@@ -133,6 +152,10 @@ model Visit_Log {
   user  User              @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   place Place_of_Interest @relation(fields: [place_id], references: [place_id], onDelete: Cascade)
 
+  @@index([user_id])
+  @@index([place_id])
+  @@index([entryTime])
+  @@index([user_id, entryTime]) 
   @@map("visit_log")
 }
 
@@ -146,5 +169,9 @@ model EMA_Log {
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
+  @@index([user_id])
+  @@index([timestamp])
+  @@index([user_id, timestamp])
+  @@index([latitude, longitude])
   @@map("ema_log")
 }
