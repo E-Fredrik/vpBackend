@@ -95,18 +95,43 @@ model Place_of_Interest {
   @@map("place_of_interest")
 }
 
+model Food {
+  food_id   Int    @id @default(autoincrement())
+  name      String
+  calories  Int
+
+  foodInLogs FoodInLog[]
+
+  @@map("food")
+}
+
+
 model Food_Log {
   log_id    Int     @id @default(autoincrement())
   user_id   Int
-  foodName  String
-  calories  Int
   timestamp BigInt
   latitude  Float?
   longitude Float?
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
+
+  foodInLogs FoodInLog[]
+
   @@map("food_log")
+}
+
+model FoodInLog {
+  id       Int @id @default(autoincrement())
+  log_id   Int
+  food_id  Int
+  quantity Int?   
+  calories Int?    
+
+  log  Food_Log @relation(fields: [log_id], references: [log_id], onDelete: Cascade)
+  food Food     @relation(fields: [food_id], references: [food_id], onDelete: Cascade)
+
+  @@map("food_log_items")
 }
 
 model Activity_Log {
