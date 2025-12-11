@@ -1,26 +1,31 @@
-import { Request, Response, NextFunction } from "express"
-import { ZodError } from "zod"
-import { ResponseError } from "../error/responseError"
+import { Request, Response, NextFunction } from "express";
+import { ZodError, ZodIssue } from "zod";
+import { ResponseError } from "../error/responseError";
 
-export const errorMiddleware = async (
+export const errorMiddleware = (
     error: Error,
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    if (error instanceof ZodError) { //Mengecek kalau error itu dari ZodError
+    console.error("🔥 errorMiddleware caught:", error);
+    if (error instanceof ZodError) {
         res.status(400).json({
-            errors: `Validation error: ${JSON.stringify(error.message)}`,
-        })
+            success: false,
+            errors: error.issues.map((e: ZodIssue) => ({
+                field: e.path.join("."),
+                message: e.message,
+            })),
+        });
     } else if (error instanceof ResponseError) {
         res.status(error.status).json({
+            success: false,
             errors: error.message,
-        })
+        });
     } else {
         res.status(500).json({
-            errors: error.message,
-        })
+            success: false,
+            errors: error.message || "Internal Server Error",
+        });
     }
-}
-
-
+};

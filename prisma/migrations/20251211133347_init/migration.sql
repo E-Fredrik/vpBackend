@@ -1,3 +1,4 @@
+[dotenv@17.2.3] injecting env (3) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
 -- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'UNDISCLOSED');
 
@@ -132,6 +133,48 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
+-- CreateIndex
+CREATE INDEX "place_of_interest_category_idx" ON "place_of_interest"("category");
+
+-- CreateIndex
+CREATE INDEX "place_of_interest_latitude_longitude_idx" ON "place_of_interest"("latitude", "longitude");
+
+-- CreateIndex
+CREATE INDEX "activity_log_user_id_idx" ON "activity_log"("user_id");
+
+-- CreateIndex
+CREATE INDEX "activity_log_activityType_idx" ON "activity_log"("activityType");
+
+-- CreateIndex
+CREATE INDEX "activity_log_startTime_idx" ON "activity_log"("startTime");
+
+-- CreateIndex
+CREATE INDEX "activity_log_user_id_startTime_idx" ON "activity_log"("user_id", "startTime");
+
+-- CreateIndex
+CREATE INDEX "visit_log_user_id_idx" ON "visit_log"("user_id");
+
+-- CreateIndex
+CREATE INDEX "visit_log_place_id_idx" ON "visit_log"("place_id");
+
+-- CreateIndex
+CREATE INDEX "visit_log_entryTime_idx" ON "visit_log"("entryTime");
+
+-- CreateIndex
+CREATE INDEX "visit_log_user_id_entryTime_idx" ON "visit_log"("user_id", "entryTime");
+
+-- CreateIndex
+CREATE INDEX "ema_log_user_id_idx" ON "ema_log"("user_id");
+
+-- CreateIndex
+CREATE INDEX "ema_log_timestamp_idx" ON "ema_log"("timestamp");
+
+-- CreateIndex
+CREATE INDEX "ema_log_user_id_timestamp_idx" ON "ema_log"("user_id", "timestamp");
+
+-- CreateIndex
+CREATE INDEX "ema_log_latitude_longitude_idx" ON "ema_log"("latitude", "longitude");
+
 -- AddForeignKey
 ALTER TABLE "friends" ADD CONSTRAINT "friends_requester_id_fkey" FOREIGN KEY ("requester_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -161,3 +204,4 @@ ALTER TABLE "visit_log" ADD CONSTRAINT "visit_log_place_id_fkey" FOREIGN KEY ("p
 
 -- AddForeignKey
 ALTER TABLE "ema_log" ADD CONSTRAINT "ema_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+

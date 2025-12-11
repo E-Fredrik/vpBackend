@@ -25,6 +25,20 @@ export interface UserResponse {
     token?: string
 }
 
+export interface UserDataDump {
+    userId: number;
+    username: string;
+    email: string;
+    bmiGoal: number;
+    weight: number;
+    height: number;
+    dailySummaries: any[];
+    foodLogs: any[];
+    activityLogs: any[];
+    visitLogs: any[];
+    emaLogs: any[];
+}
+
 export function toUserResponse(
     id: number,
     username: string,

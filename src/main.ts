@@ -3,14 +3,19 @@ import { PORT } from "./utils/env-util";
 import { publicRouter } from "./routes/publicApi";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 
-const app = express()
-app.use(express.json())
+const app = express();
 
-app.use('/api', publicRouter)
+// Middleware
+app.use(express.json());
+
+console.log("▶️ Starting server..."); // debug
+
+// API Routes
+app.use("/api", publicRouter);
 
 
 app.use(errorMiddleware)
 
 app.listen(PORT || 3000, () => {
-    console.log(`Connected to port ${PORT || 3000}`);
+    console.log(`Server running on port ${PORT || 3000}`);
 });
