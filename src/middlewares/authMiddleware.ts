@@ -9,23 +9,24 @@ export const authMiddleware = (
     next: NextFunction
 ) => {
     try {
-        const authHeader = req.headers["authorization"]
-        const token = authHeader && authHeader.split(" ")[1]
-        
+        const raw = req.headers["authorization"]
+        const authHeader = Array.isArray(raw) ? raw[0] : raw
+        const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : authHeader?.split(" ")[1]
+
         if (!token) {
-            next(new ResponseError(401, "Unauthorized user!"))
+            return next(new ResponseError(401, "Unauthorized user!"))
         }
 
-        const payload = verifyToken(token!)
-
-        if (payload) {
-            req.user = payload
-        } else {
-            next(new ResponseError(401, "Unauthorized user!"))
+        let payload
+        try {
+            payload = verifyToken(token)
+        } catch (err) {
+            return next(new ResponseError(401, "Unauthorized user!"))
         }
 
-        next()
+        req.user = payload
+        return next()
     } catch (error) {
-        next(error)
+        return next(error)
     }
 }
