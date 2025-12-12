@@ -12,27 +12,23 @@ import { EmaLogController } from "../controllers/emaLogController";
 
 export const publicRouter = express.Router();
 console.log("✅ publicRouter module loaded"); // debug
+
+//dumps
 publicRouter.post("/dumpuserdata", UserController.dumpUserData);
 publicRouter.post("/dumpfrienddata", FriendController.dumpFriendData)
 
-// ============================================
-// AUTH ROUTES
-// ============================================
+//loginregister
 publicRouter.post("/register", UserController.register);
 publicRouter.post("/login", UserController.login);
 
-// ============================================
-// FRIEND ROUTES
-// ============================================
+// friends routes
 publicRouter.post("/friends", FriendController.create);
 publicRouter.get("/friends/:id", FriendController.getById);
 publicRouter.get("/friends/user/:userId", FriendController.getByUserId);
 publicRouter.patch("/friends/:id", FriendController.updateStatus);
 publicRouter.delete("/friends/:id", FriendController.delete);
 
-// ============================================
-// DAILY SUMMARY ROUTES
-// ============================================
+// daily summary routes
 publicRouter.post("/daily-summaries", DailySummaryController.create);
 publicRouter.get("/daily-summaries/:id", DailySummaryController.getById);
 publicRouter.get("/daily-summaries/user/:userId", DailySummaryController.getByUserId);
@@ -40,9 +36,7 @@ publicRouter.get("/daily-summaries/user/:userId/date/:date", DailySummaryControl
 publicRouter.patch("/daily-summaries/:id", DailySummaryController.update);
 publicRouter.delete("/daily-summaries/:id", DailySummaryController.delete);
 
-// ============================================
-// PLACE OF INTEREST ROUTES
-// ============================================
+// places
 publicRouter.post("/places", PlaceController.create);
 publicRouter.get("/places", PlaceController.getAll);
 publicRouter.get("/places/nearby", PlaceController.getNearby);
@@ -51,19 +45,11 @@ publicRouter.get("/places/:id", PlaceController.getById);
 publicRouter.patch("/places/:id", PlaceController.update);
 publicRouter.delete("/places/:id", PlaceController.delete);
 
-// ============================================
-// FOOD ROUTES
-// ============================================
+//food routes
 publicRouter.post("/foods", FoodController.createFood);
 publicRouter.delete("/foods/:id", FoodController.getFood);
 
-
-
-
-
-// ============================================
-// FOOD LOG ROUTES
-// ============================================
+//food logs routes
 publicRouter.post("/food-logs", FoodLogController.create);
 publicRouter.get("/food-logs/:id", FoodLogController.getById);
 publicRouter.get("/food-logs/user/:userId", FoodLogController.getByUserId);
@@ -71,18 +57,14 @@ publicRouter.get("/food-logs/user/:userId/range", FoodLogController.getByUserIdA
 publicRouter.patch("/food-logs/:id", FoodLogController.update);
 publicRouter.delete("/food-logs/:id", FoodLogController.delete);
 
-// ============================================
-// FOOD IN LOG ROUTES (Food items in a log)
-// ============================================
+//foods in foodlog routes
 publicRouter.post("/food-in-logs", FoodInLogController.create);
 publicRouter.get("/food-in-logs/:id", FoodInLogController.getById);
 publicRouter.get("/food-in-logs/log/:logId", FoodInLogController.getByLogId);
 publicRouter.patch("/food-in-logs/:id", FoodInLogController.update);
 publicRouter.delete("/food-in-logs/:id", FoodInLogController.delete);
 
-// ============================================
-// ACTIVITY LOG ROUTES
-// ============================================
+//activitylog routes
 publicRouter.post("/activity-logs", ActivityLogController.create);
 publicRouter.get("/activity-logs/:id", ActivityLogController.getById);
 publicRouter.get("/activity-logs/user/:userId", ActivityLogController.getByUserId);
@@ -91,9 +73,7 @@ publicRouter.get("/activity-logs/user/:userId/type/:activityType", ActivityLogCo
 publicRouter.patch("/activity-logs/:id", ActivityLogController.update);
 publicRouter.delete("/activity-logs/:id", ActivityLogController.delete);
 
-// ============================================
-// VISIT LOG ROUTES
-// ============================================
+//visit logs routes
 publicRouter.post("/visit-logs", VisitLogController.create);
 publicRouter.get("/visit-logs/:id", VisitLogController.getById);
 publicRouter.get("/visit-logs/user/:userId", VisitLogController.getByUserId);
@@ -102,9 +82,7 @@ publicRouter.get("/visit-logs/user/:userId/range", VisitLogController.getByUserI
 publicRouter.patch("/visit-logs/:id", VisitLogController.update);
 publicRouter.delete("/visit-logs/:id", VisitLogController.delete);
 
-// ============================================
-// EMA LOG ROUTES
-// ============================================
+//ema log routes
 publicRouter.post("/ema-logs", EmaLogController.create);
 publicRouter.get("/ema-logs/:id", EmaLogController.getById);
 publicRouter.get("/ema-logs/user/:userId", EmaLogController.getByUserId);
