@@ -139,6 +139,47 @@ export class ActivityLogService {
         return { message: "Activity log deleted successfully" };
     }
 
+    /**
+     * Bulk create activity logs (for batch uploads from Android)
+     */
+    static async bulkCreate(activities: CreateActivityLogRequest[]) {
+        const results = [];
+        for (const activity of activities) {
+            const validatedData = Validation.validate(ActivityLogValidation.CREATE, activity);
+            const created = await prismaClient.activity_Log.create({
+                data: {
+                    user_id: validatedData.user_id,
+                    activityType: validatedData.activityType,
+                    startTime: BigInt(validatedData.startTime),
+                    endTime: BigInt(validatedData.endTime),
+                    confidence: validatedData.confidence,
+                },
+            });
+            results.push(this.serialize(created));
+        }
+        return results;
+    }
+
+    /**
+     * Get ongoing activity for user (if any)
+     */
+    static async getCurrentActivity(userId: number) {
+        const now = Date.now();
+        const recentThreshold = now - (10 * 60 * 1000); // 10 minutes ago
+
+        const activity = await prismaClient.activity_Log.findFirst({
+            where: {
+                user_id: userId,
+                startTime: {
+                    gte: BigInt(recentThreshold)
+                }
+            },
+            orderBy: { startTime: 'desc' }
+        });
+
+        return activity ? this.serialize(activity) : null;
+    }
+
     // Helper to convert BigInt to number for JSON serialization
     private static serialize(activity: any) {
         return {

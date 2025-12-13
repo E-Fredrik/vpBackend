@@ -9,13 +9,14 @@ import { FoodInLogController } from "../controllers/foodInLogController";
 import { ActivityLogController } from "../controllers/activityLogController";
 import { VisitLogController } from "../controllers/visitLogController";
 import { EmaLogController } from "../controllers/emaLogController";
+import { NotificationController } from "../controllers/notificationController";
 
 export const publicRouter = express.Router();
-console.log("✅ publicRouter module loaded"); // debug
 
 //dumps
-publicRouter.post("/dumpuserdata", UserController.dumpUserData);
-publicRouter.post("/dumpfrienddata", FriendController.dumpFriendData)
+
+//notification routes
+publicRouter.get("/notifications/location-check/:userId", NotificationController.checkLocationTriggers);
 
 //loginregister
 publicRouter.post("/register", UserController.register);
@@ -66,8 +67,10 @@ publicRouter.delete("/food-in-logs/:id", FoodInLogController.delete);
 
 //activitylog routes
 publicRouter.post("/activity-logs", ActivityLogController.create);
+publicRouter.post("/activity-logs/bulk", ActivityLogController.bulkCreate);
 publicRouter.get("/activity-logs/:id", ActivityLogController.getById);
 publicRouter.get("/activity-logs/user/:userId", ActivityLogController.getByUserId);
+publicRouter.get("/activity-logs/user/:userId/current", ActivityLogController.getCurrentActivity);
 publicRouter.get("/activity-logs/user/:userId/range", ActivityLogController.getByUserIdAndDateRange);
 publicRouter.get("/activity-logs/user/:userId/type/:activityType", ActivityLogController.getByUserIdAndActivityType);
 publicRouter.patch("/activity-logs/:id", ActivityLogController.update);

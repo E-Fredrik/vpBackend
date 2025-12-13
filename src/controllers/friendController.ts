@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { FriendService } from "../services/friendService";
-import { LoginUserRequest } from "../models/userModel";
+import { UserRequest } from "../models/userRequestModel";
+import { toFriendResponse } from "../models/friendModel";
 
 export class FriendController {
     static async create(req: Request, res: Response, next: NextFunction) {
@@ -12,11 +13,27 @@ export class FriendController {
         }
     }
 
-    static async dumpFriendData(req: Request, res: Response, next: NextFunction) {
+    static async dumpFriendData(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            console.log("dumpFriendData called, body:", req.body);
-            const request: LoginUserRequest = req.body as LoginUserRequest;
-            const result = await FriendService.dumpFriendData(request);
+            const user = req.user;
+            if (!user) {
+                return res.status(401).json({ success: false, message: "Unauthorized" });
+            }
+
+            const friendships = await FriendService.getByUserId(user.id);
+            const friends = friendships.map((f: any) => toFriendResponse(f));
+
+            const result = {
+                userId: user.id,
+                username: user.username,
+                email: user.email,
+                friends,
+                metadata: {
+                    totalFriends: friends.length,
+                    exportedAt: new Date().toISOString(),
+                },
+            };
+
             res.status(200).json({ success: true, data: result });
         } catch (error) {
             next(error);

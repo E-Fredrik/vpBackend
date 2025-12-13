@@ -42,51 +42,96 @@ async function main() {
 
   console.log("✅ Created users:", { user1: user1.username, user2: user2.username });
 
-  // Create places
+  // Create places in Surabaya (replace the places array)
   const places = await Promise.all([
     prisma.place_of_Interest.create({
       data: {
-        name: "Central Park Gym",
+        name: "Tunjungan Plaza Gym",
         category: "GYM",
-        latitude: 40.7829,
-        longitude: -73.9654,
+        latitude: -7.2644,
+        longitude: 112.7378,
         geofenceRadius: 100
       }
     }),
     prisma.place_of_Interest.create({
       data: {
-        name: "Downtown Restaurant",
-        category: "RESTAURANT",
-        latitude: 40.7128,
-        longitude: -74.0060,
-        geofenceRadius: 50
+        name: "Taman Bungkul",
+        category: "PARK",
+        latitude: -7.2894,
+        longitude: 112.7344,
+        geofenceRadius: 150
       }
     }),
     prisma.place_of_Interest.create({
       data: {
-        name: "Central Park",
-        category: "PARK",
-        latitude: 40.7850,
-        longitude: -73.9740,
+        name: "Pakuwon Mall",
+        category: "STORE",
+        latitude: -7.2891,
+        longitude: 112.6726,
         geofenceRadius: 200
       }
     }),
     prisma.place_of_Interest.create({
       data: {
-        name: "Whole Foods Market",
+        name: "Surabaya Town Square",
         category: "STORE",
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2656,
+        longitude: 112.7414,
+        geofenceRadius: 150
+      }
+    }),
+    prisma.place_of_Interest.create({
+      data: {
+        name: "Rumah Makan Sederhana",
+        category: "RESTAURANT",
+        latitude: -7.2575,
+        longitude: 112.7521,
+        geofenceRadius: 50
+      }
+    }),
+    prisma.place_of_Interest.create({
+      data: {
+        name: "Warung Apung Rahmawati",
+        category: "RESTAURANT",
+        latitude: -7.3474,
+        longitude: 112.7274,
         geofenceRadius: 75
       }
     }),
     prisma.place_of_Interest.create({
       data: {
-        name: "Starbucks Coffee",
+        name: "G-Walk Citraland",
         category: "RESTAURANT",
-        latitude: 40.7614,
-        longitude: -73.9776,
-        geofenceRadius: 30
+        latitude: -7.2797,
+        longitude: 112.6304,
+        geofenceRadius: 100
+      }
+    }),
+    prisma.place_of_Interest.create({
+      data: {
+        name: "Galaxy Mall Gym",
+        category: "GYM",
+        latitude: -7.2701,
+        longitude: 112.6738,
+        geofenceRadius: 80
+      }
+    }),
+    prisma.place_of_Interest.create({
+      data: {
+        name: "Taman Prestasi",
+        category: "PARK",
+        latitude: -7.2916,
+        longitude: 112.7979,
+        geofenceRadius: 120
+      }
+    }),
+    prisma.place_of_Interest.create({
+      data: {
+        name: "Kebun Bibit Wonorejo",
+        category: "PARK",
+        latitude: -7.2814,
+        longitude: 112.7831,
+        geofenceRadius: 200
       }
     })
   ]);
@@ -131,22 +176,22 @@ async function main() {
 
   console.log("✅ Created friendship between users");
 
-  // Seed data for last 7 days for user1
-  for (let day = 6; day >= 0; day--) {
+  // Seed data for last 7 days for user1 (but skip today to allow notifications)
+  for (let day = 7; day >= 1; day--) {
     const baseTime = getDaysAgo(day);
     const date = new Date(baseTime);
     date.setHours(0, 0, 0, 0);
 
     let dailyCalories = 0;
 
-    // Breakfast (8 AM)
+    // Breakfast (8 AM) - at a different restaurant (Warung Apung)
     const breakfastTime = baseTime;
     const breakfast = await prisma.food_Log.create({
       data: {
         user_id: user1.user_id,
         timestamp: BigInt(breakfastTime),
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.3474,
+        longitude: 112.7274,
         foodInLogs: {
           create: [
             { food_id: foods[1].food_id, quantity: 1, calories: 250 },
@@ -163,8 +208,8 @@ async function main() {
       data: {
         user_id: user1.user_id,
         timestamp: BigInt(snackTime),
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         foodInLogs: {
           create: [
             { food_id: foods[8].food_id, quantity: 1, calories: 160 }
@@ -180,8 +225,8 @@ async function main() {
       data: {
         user_id: user1.user_id,
         timestamp: BigInt(lunchTime),
-        latitude: 40.7128,
-        longitude: -74.0060,
+        latitude: -7.2656,
+        longitude: 112.7414,
         foodInLogs: {
           create: [
             { food_id: foods[0].food_id, quantity: 1, calories: 350 },
@@ -198,8 +243,8 @@ async function main() {
       data: {
         user_id: user1.user_id,
         timestamp: BigInt(afternoonSnackTime),
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         foodInLogs: {
           create: [
             { food_id: foods[11].food_id, quantity: 1, calories: 95 }
@@ -215,8 +260,8 @@ async function main() {
       data: {
         user_id: user1.user_id,
         timestamp: BigInt(dinnerTime),
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         foodInLogs: {
           create: [
             { food_id: foods[6].food_id, quantity: 1, calories: 450 }
@@ -312,8 +357,8 @@ async function main() {
         timestamp: BigInt(morningEmaTime),
         moodScore: 7 + (day % 2),
         context: "Morning routine completed, feeling energized",
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         geofenceRadius: 50
       }
     });
@@ -326,8 +371,8 @@ async function main() {
         timestamp: BigInt(afternoonEmaTime),
         moodScore: 6 + (day % 3),
         context: "Post-lunch, back to work",
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         geofenceRadius: 30
       }
     });
@@ -340,8 +385,8 @@ async function main() {
         timestamp: BigInt(eveningEmaTime),
         moodScore: 8 - (day % 2),
         context: "End of day, relaxing at home",
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         geofenceRadius: 50
       }
     });
@@ -363,8 +408,8 @@ async function main() {
       data: {
         user_id: user2.user_id,
         timestamp: BigInt(breakfastTime),
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         foodInLogs: {
           create: [
             { food_id: foods[5].food_id, quantity: 1, calories: 300 },
@@ -381,8 +426,8 @@ async function main() {
       data: {
         user_id: user2.user_id,
         timestamp: BigInt(lunchTime),
-        latitude: 40.7128,
-        longitude: -74.0060,
+        latitude: -7.2656,
+        longitude: 112.7414,
         foodInLogs: {
           create: [
             { food_id: foods[10].food_id, quantity: 1, calories: 550 }
@@ -398,8 +443,8 @@ async function main() {
       data: {
         user_id: user2.user_id,
         timestamp: BigInt(snackTime),
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         foodInLogs: {
           create: [
             { food_id: foods[3].food_id, quantity: 1, calories: 150 }
@@ -415,8 +460,8 @@ async function main() {
       data: {
         user_id: user2.user_id,
         timestamp: BigInt(dinnerTime),
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         foodInLogs: {
           create: [
             { food_id: foods[2].food_id, quantity: 1, calories: 400 }
@@ -499,8 +544,8 @@ async function main() {
         timestamp: BigInt(morningEmaTime),
         moodScore: 8,
         context: "Started the day with yoga, feeling great",
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         geofenceRadius: 30
       }
     });
@@ -513,8 +558,8 @@ async function main() {
         timestamp: BigInt(afternoonEmaTime),
         moodScore: 7,
         context: "Productive afternoon",
-        latitude: 40.7589,
-        longitude: -73.9851,
+        latitude: -7.2575,
+        longitude: 112.7521,
         geofenceRadius: 50
       }
     });
@@ -527,8 +572,8 @@ async function main() {
         timestamp: BigInt(eveningEmaTime),
         moodScore: 9,
         context: "Relaxing evening after a good day",
-        latitude: 40.7614,
-        longitude: -73.9776,
+        latitude: -7.2644,
+        longitude: 112.7378,
         geofenceRadius: 30
       }
     });

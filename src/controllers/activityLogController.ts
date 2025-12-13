@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ActivityLogService } from "../services/activityLogService";
+import { ResponseError } from "../error/responseError";
 
 export class ActivityLogController {
     static async create(req: Request, res: Response, next: NextFunction) {
@@ -73,6 +74,29 @@ export class ActivityLogController {
             const activityId = parseInt(req.params.id);
             await ActivityLogService.delete(activityId);
             res.status(200).json({ success: true, message: "Activity log deleted" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async bulkCreate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const activities = req.body.activities as any[];
+            if (!Array.isArray(activities)) {
+                throw new ResponseError(400, "Request body must contain 'activities' array");
+            }
+            const result = await ActivityLogService.bulkCreate(activities);
+            res.status(201).json({ success: true, data: result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getCurrentActivity(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = parseInt(req.params.userId);
+            const result = await ActivityLogService.getCurrentActivity(userId);
+            res.status(200).json({ success: true, data: result });
         } catch (error) {
             next(error);
         }

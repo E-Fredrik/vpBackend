@@ -20,7 +20,7 @@ export class FriendService {
     static async create(request: CreateFriendRequest) {
         const validatedData = Validation.validate(FriendValidation.CREATE, request);
 
-        // Check if both users exist
+        
         const [requester, addressee] = await Promise.all([
             prismaClient.user.findUnique({ where: { user_id: validatedData.requester_id } }),
             prismaClient.user.findUnique({ where: { user_id: validatedData.addressee_id } }),
@@ -118,47 +118,5 @@ export class FriendService {
         return prismaClient.friend.delete({
             where: { friend_id: friendId },
         });
-    }
-
-    // Dump friend data for an authenticated user (by email/password)
-    static async dumpFriendData(request: LoginUserRequest) {
-        const validatedData = Validation.validate(UserValidation.LOGIN, request);
-
-        const user = await prismaClient.user.findFirst({
-            where: { email: validatedData.email },
-        });
-
-        if (!user) {
-            throw new ResponseError(400, "Invalid email or password!");
-        }
-
-        const isPasswordValid = await bcrypt.compare(validatedData.password, user.password);
-        if (!isPasswordValid) {
-            throw new ResponseError(400, "Invalid email or password!");
-        }
-
-        const friendships = await prismaClient.friend.findMany({
-            where: {
-                OR: [{ requester_id: user.user_id }, { addressee_id: user.user_id }],
-            },
-            include: {
-                requester: { select: { user_id: true, username: true, email: true } },
-                addressee: { select: { user_id: true, username: true, email: true } },
-            },
-            orderBy: { createdAt: "desc" },
-        });
-
-        const friends = friendships.map((f) => toFriendResponse(f));
-
-        return {
-            userId: user.user_id,
-            username: user.username,
-            email: user.email,
-            friends,
-            metadata: {
-                totalFriends: friends.length,
-                exportedAt: new Date().toISOString(),
-            },
-        };
     }
 }

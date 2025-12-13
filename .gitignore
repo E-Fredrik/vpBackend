@@ -3,3 +3,5 @@ node_modules
 .env
 
 /generated/prisma
+/alpVP
+/ANDROID_INTEGRATION
