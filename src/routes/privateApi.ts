@@ -16,3 +16,5 @@ privateRouter.post('/foodlogs', FoodLogController.createFoodLog)
 privateRouter.get('/foodlogs/:log_id', FoodLogController.getFoodLog)
 privateRouter.put('/foodlogs/:log_id', FoodLogController.updateFoodLog)
 privateRouter.delete('/foodlogs/:log_id', FoodLogController.deleteFoodLog)
+
+privateRouter.get('/foodlogs/user/:user_id', FoodLogController.getFoodLogsByUser)

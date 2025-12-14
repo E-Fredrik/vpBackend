@@ -78,4 +78,11 @@ export class FoodLogService {
         return "Food log deleted successfully."
     }
 
+    static async getFoodLogsByUser(userId: number): Promise<FoodLogResponse[]> {
+        const existingLogs = await prismaClient.food_Log.findMany({
+            where: { user_id: userId },
+            include: { foodInLogs: { include: { food: true } } },
+        })
+        return existingLogs.map(log => toFoodLogResponse(log))
+    }
 }

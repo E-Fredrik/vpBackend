@@ -9,8 +9,8 @@ export interface FoodLogCreateUpdateRequest {
     foods: {
         food_id: number
         quantity?: number
-        calories?: number
-    }[]
+            calories?: number
+        }[]
 }
 
 export interface FoodLogResponse extends Partial<FoodLogCreateUpdateRequest> {

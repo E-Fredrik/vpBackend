@@ -76,4 +76,20 @@ export class FoodLogController {
             next(error);
         }
     }
+
+    static async getFoodLogsByUser(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const user = req.user
+            if (!user) return next(new ResponseError(401, "Unauthorized"))
+            const userId = Number(req.params.user_id)
+            if (user.id !== userId) return next(new ResponseError(403, "Forbidden"))
+            const response = await FoodLogService.getFoodLogsByUser(userId);
+            res.status(200).json({
+                data: response,
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
 }
