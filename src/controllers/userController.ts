@@ -6,6 +6,8 @@ import {
     UserResponse
 } from '../models/userModel'
 import { UserService } from '../services/userService';
+import { UserRequest } from '../models/userRequestModel';
+import { ResponseError } from '../error/responseError';
 
 console.log("🧭 UserController module loaded");
 
@@ -49,6 +51,22 @@ export class UserController {
             })
         }
         catch (error) {
+            next(error)
+        }
+    }
+
+    static async getProfile(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                throw new ResponseError(401, "Unauthorized!")
+            }
+
+            const response = await UserService.getProfile(req.user.id)
+            
+            res.status(200).json({
+                data: response,
+            })
+        } catch (error) {
             next(error)
         }
     }

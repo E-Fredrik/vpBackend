@@ -39,6 +39,26 @@ export interface UserDataDump {
     emaLogs: any[];
 }
 
+export interface UserProfileResponse {
+    userId: number
+    username: string
+    email: string
+    weight: number
+    height: number
+    bmi: number
+    bmiGoal: number
+    memberSince: Date
+    recentFoodLogs: {
+        logId: number
+        timestamp: number
+        foods: {
+            foodName: string
+            calories: number
+            quantity: number
+        }[]
+    }[]
+}
+
 export function toUserResponse(
     id: number,
     username: string,

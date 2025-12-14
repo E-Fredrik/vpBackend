@@ -8,7 +8,7 @@ export const errorMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    console.error("🔥 errorMiddleware caught:", error);
+    console.error(error);
     if (error instanceof ZodError) {
         res.status(400).json({
             success: false,

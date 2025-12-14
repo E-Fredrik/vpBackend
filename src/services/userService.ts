@@ -135,4 +135,71 @@ export class UserService {
         console.log("UserService.dumpUserData returning payload");
         return result;
     }
+
+    static async getProfile(userId: number) {
+        const user = await prismaClient.user.findUnique({
+            where: { user_id: userId },
+            select: {
+                user_id: true,
+                username: true,
+                email: true,
+                weight: true,
+                height: true,
+                bmiGoal: true,
+            }
+        })
+
+        if (!user) {
+            throw new ResponseError(404, "User not found!")
+        }
+
+        const weight = user.weight ?? 0
+        const height = user.height ?? 0
+        const bmi = height > 0 ? weight / Math.pow(height / 100, 2) : 0
+
+        // Get recent food logs (last 24 hours)
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        const yesterdayTimestamp = BigInt(Math.floor(yesterday.getTime()))
+
+        const recentFoodLogs = await prismaClient.food_Log.findMany({
+            where: {
+                user_id: userId,
+                timestamp: {
+                    gte: yesterdayTimestamp
+                }
+            },
+            include: {
+                foodInLogs: {
+                    include: {
+                        food: true
+                    }
+                }
+            },
+            orderBy: {
+                timestamp: 'desc'
+            },
+            take: 10
+        })
+
+        return {
+            userId: user.user_id,
+            username: user.username,
+            email: user.email,
+            weight: weight,
+            height: height,
+            bmi: parseFloat(bmi.toFixed(2)),
+            bmiGoal: user.bmiGoal ?? 0,
+            memberSince: new Date(),
+            recentFoodLogs: recentFoodLogs.map((log) => ({
+                logId: log.log_id,
+                timestamp: Number(log.timestamp),
+                foods: log.foodInLogs.map((fil) => ({
+                    foodName: fil.food.name,
+                    calories: fil.calories ?? (fil.food.calories * (fil.quantity ?? 1)),
+                    quantity: fil.quantity ?? 1
+                }))
+            }))
+        }
+    }
 }

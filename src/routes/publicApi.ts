@@ -9,14 +9,12 @@ import { FoodInLogController } from "../controllers/foodInLogController";
 import { ActivityLogController } from "../controllers/activityLogController";
 import { VisitLogController } from "../controllers/visitLogController";
 import { EmaLogController } from "../controllers/emaLogController";
-import { NotificationController } from "../controllers/notificationController";
 
 export const publicRouter = express.Router();
 
 //dumps
 
-//notification routes
-publicRouter.get("/notifications/location-check/:userId", NotificationController.checkLocationTriggers);
+//notification routes are protected and moved to private API
 
 //loginregister
 publicRouter.post("/register", UserController.register);
