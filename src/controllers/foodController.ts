@@ -15,6 +15,19 @@ export class FoodController {
         }
     }
 
+    static async getFoodByName(req: Request, res: Response, next: NextFunction) {
+        try {
+            const name = req.params.name
+            const response = await FoodService.getFoodByName(name);
+            res.status(200).json({
+                data: response,
+            })
+        }
+        catch (error) {
+            next(error)
+        }
+    }
+
     static async createFood(req: Request, res: Response, next: NextFunction) {
         try {
             const request: FoodCreateUpdateRequest = req.body as FoodCreateUpdateRequest;

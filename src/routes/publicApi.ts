@@ -9,3 +9,4 @@ publicRouter.post('/login', UserController.login);
 
 publicRouter.post('/createfood', FoodController.createFood);
 publicRouter.get('/getfood/:food_id', FoodController.getFood);
+publicRouter.get('/getfoodbyname/:name', FoodController.getFoodByName); 
