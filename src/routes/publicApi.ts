@@ -47,6 +47,9 @@ publicRouter.delete("/places/:id", PlaceController.delete);
 //food routes
 publicRouter.post("/foods", FoodController.createFood);
 publicRouter.delete("/foods/:id", FoodController.getFood);
+publicRouter.post('/createfood', FoodController.createFood);
+publicRouter.get('/getfood/:food_id', FoodController.getFood);
+publicRouter.get('/getfoodbyname/:name', FoodController.getFoodByName); 
 
 //food logs routes
 publicRouter.post("/food-logs", FoodLogController.create);

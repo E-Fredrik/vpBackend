@@ -4,17 +4,12 @@ import { publicRouter } from "./routes/publicApi";
 import { privateRouter } from "./routes/privateApi"
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 
-const app = express();
 
-// Middleware
-app.use(express.json());
+const app = express()
+app.use(express.json())
 
-console.log("▶️ Starting server..."); // debug
-
-// API Routes
-app.use("/api", publicRouter);
-app.use("/api", privateRouter);
-
+app.use('/api', publicRouter)
+app.use('/api', privateRouter)
 
 
 app.use(errorMiddleware)
