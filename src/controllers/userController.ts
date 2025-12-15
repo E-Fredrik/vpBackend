@@ -70,4 +70,54 @@ export class UserController {
             next(error)
         }
     }
+
+    static async getNotificationSettings(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?.id
+            if (!userId) {
+                throw new ResponseError(401, "Unauthorized")
+            }
+            
+            const user = await UserService.getNotificationSettings(userId)
+            
+            res.status(200).json({
+                success: true,
+                data: user
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    
+    static async updateNotificationSettings(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?.id
+            if (!userId) {
+                throw new ResponseError(401, "Unauthorized")
+            }
+            
+            const { 
+                notificationEnabled, 
+                breakfastTime, 
+                lunchTime, 
+                dinnerTime,
+                snackTime 
+            } = req.body
+            
+            const updated = await UserService.updateNotificationSettings(userId, {
+                notificationEnabled,
+                breakfastTime,
+                lunchTime,
+                dinnerTime,
+                snackTime
+            })
+            
+            res.status(200).json({
+                success: true,
+                data: updated
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }

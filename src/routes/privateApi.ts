@@ -39,6 +39,8 @@ privateRouter.post("/dumpfrienddata", FriendController.dumpFriendData);
 // Notification Routes (authenticated)
 // ============================================================================
 privateRouter.get("/notifications/location-check/:userId", NotificationController.checkLocationTriggers);
+privateRouter.get("/notification-settings", UserController.getNotificationSettings);
+privateRouter.put("/notification-settings", UserController.updateNotificationSettings);
 
 // ============================================================================
 // Daily Summary Routes (authenticated)

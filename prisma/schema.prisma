@@ -48,6 +48,14 @@ model User {
   email        String           @unique
   birthDate    DateTime?
   gender       Gender?
+  
+  // Notification preferences
+  notificationEnabled Boolean @default(true)
+  breakfastTime String? @default("08:00")
+  lunchTime String? @default("12:00")
+  dinnerTime String? @default("18:00")
+  snackTime String? @default("15:00")
+  
   requestedFriends  Friend[]       @relation("RequesterFriends")
   addresseeFriends  Friend[]       @relation("AddresseeFriends")
   dailySummaries    Daily_Summary[]

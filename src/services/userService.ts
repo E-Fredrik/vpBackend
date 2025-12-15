@@ -202,4 +202,55 @@ export class UserService {
             }))
         }
     }
+
+    static async getNotificationSettings(userId: number) {
+        const user = await prismaClient.user.findUnique({
+            where: { user_id: userId },
+            select: {
+                notificationEnabled: true,
+                breakfastTime: true,
+                lunchTime: true,
+                dinnerTime: true,
+                snackTime: true
+            }
+        })
+        
+        if (!user) {
+            throw new ResponseError(404, "User not found")
+        }
+        
+        return user
+    }
+    
+    static async updateNotificationSettings(
+        userId: number, 
+        settings: {
+            notificationEnabled?: boolean
+            breakfastTime?: string
+            lunchTime?: string
+            dinnerTime?: string
+            snackTime?: string
+        }
+    ) {
+        const updated = await prismaClient.user.update({
+            where: { user_id: userId },
+            data: {
+                notificationEnabled: settings.notificationEnabled ?? undefined,
+                breakfastTime: settings.breakfastTime ?? undefined,
+                lunchTime: settings.lunchTime ?? undefined,
+                dinnerTime: settings.dinnerTime ?? undefined,
+                snackTime: settings.snackTime ?? undefined
+            },
+            select: {
+                user_id: true,
+                notificationEnabled: true,
+                breakfastTime: true,
+                lunchTime: true,
+                dinnerTime: true,
+                snackTime: true
+            }
+        })
+        
+        return updated
+    }
 }
