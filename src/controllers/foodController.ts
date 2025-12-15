@@ -31,9 +31,9 @@ export class FoodController {
     static async createFood(req: Request, res: Response, next: NextFunction) {
         try {
             const request: FoodCreateUpdateRequest = req.body as FoodCreateUpdateRequest;
-            const message = await FoodService.createFood(request);
+            const response = await FoodService.createFood(request);
             res.status(200).json({
-                message: message,
+                data: response,
             })
         } catch (error) {
             next(error)

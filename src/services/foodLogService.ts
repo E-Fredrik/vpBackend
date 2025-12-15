@@ -44,7 +44,7 @@ export class FoodLogService {
         }
 
         // Create food log with associated food items
-        return prismaClient.food_Log.create({
+        const createdLog = await prismaClient.food_Log.create({
             data: {
                 user_id: validatedData.user_id,
                 timestamp: BigInt(validatedData.timestamp),
@@ -68,6 +68,8 @@ export class FoodLogService {
                 },
             },
         });
+
+        return this.serializeFoodLog(createdLog);
     }
 
     static async getById(logId: number) {

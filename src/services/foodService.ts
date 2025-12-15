@@ -44,17 +44,17 @@ export class FoodService {
 
     static async createFood(
         request: FoodCreateUpdateRequest,
-    ): Promise<string> {
+    ): Promise<FoodResponse> {
         const validatedData = Validation.validate(
             FoodValidation.CREATE, request
         )
-        await prismaClient.food.create({
+        const created = await prismaClient.food.create({
             data: {
                 name: validatedData.name,
                 calories: validatedData.calories,
             },
         })
-        return "Food created successfully!"
+        return toFoodResponse(created)
     }
 
     static async updateFood(

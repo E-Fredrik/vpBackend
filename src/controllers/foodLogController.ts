@@ -100,8 +100,16 @@ export class FoodLogController {
         try {
             const user = req.user
             if (!user) return next(new ResponseError(401, "Unauthorized"))
-            const userId = Number(req.params.user_id)
-            if (user.id !== userId) return next(new ResponseError(403, "Forbidden"))
+            
+            // Use the authenticated user's ID from the token
+            const userId = user.id;
+            const requestedUserId = Number(req.params.user_id);
+            
+            // Optional: Still allow checking if they match (for security)
+            if (requestedUserId && userId !== requestedUserId) {
+                return next(new ResponseError(403, "Forbidden"))
+            }
+            
             const response = await FoodLogService.getByUserId(userId);
             res.status(200).json({
                 data: response,
