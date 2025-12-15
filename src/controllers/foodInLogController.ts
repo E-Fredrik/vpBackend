@@ -1,51 +1,93 @@
-import { Request, Response, NextFunction } from "express";
-import { FoodInLogService } from "../services/foodInLogService";
+import { Response, NextFunction } from "express"
+import { FoodInLogService } from "../services/foodInLogService"
+import { FoodInLogCreateUpdateRequest } from "../models/foodInLogModel"
+import { UserRequest } from "../models/userRequestModel"
+import { prismaClient } from "../utils/databaseUtil"
+import { ResponseError } from "../error/responseError"
 
 export class FoodInLogController {
-    static async create(req: Request, res: Response, next: NextFunction) {
+    static async createFoodInLog(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const result = await FoodInLogService.create(req.body);
-            res.status(201).json({ success: true, data: result });
+            const user = req.user
+            if (!user) return next(new ResponseError(401, "Unauthorized"))
+
+            const request: FoodInLogCreateUpdateRequest = req.body as FoodInLogCreateUpdateRequest;
+
+            const log = await prismaClient.food_Log.findUnique({ where: { log_id: request.log_id } })
+            if (!log) return next(new ResponseError(404, "Log not found"))
+            if (log.user_id !== user.id) return next(new ResponseError(403, "Forbidden"))
+
+            const response = await FoodInLogService.createFoodInLog(request);
+            res.status(200).json({
+                data: response,
+            })
         } catch (error) {
             next(error);
         }
     }
 
-    static async getById(req: Request, res: Response, next: NextFunction) {
+    static async getFoodInLog(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id);
-            const result = await FoodInLogService.getById(id);
-            res.status(200).json({ success: true, data: result });
+            const user = req.user
+            if (!user) return next(new ResponseError(401, "Unauthorized"))
+
+            const foodInLogId = Number(req.params.food_in_log_id);
+            const existing = await prismaClient.foodInLog.findUnique({
+                where: { id: foodInLogId },
+                include: { log: true }
+            })
+            if (!existing) return next(new ResponseError(404, "Food in log not found"))
+            if (existing.log.user_id !== user.id) return next(new ResponseError(403, "Forbidden"))
+
+            const response = await FoodInLogService.getFoodInLog(foodInLogId);
+            res.status(200).json({
+                data: response,
+            });
         } catch (error) {
             next(error);
         }
     }
 
-    static async getByLogId(req: Request, res: Response, next: NextFunction) {
+    static async updateFoodInLog(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const logId = parseInt(req.params.logId);
-            const result = await FoodInLogService.getByLogId(logId);
-            res.status(200).json({ success: true, data: result });
+            const user = req.user
+            if (!user) return next(new ResponseError(401, "Unauthorized"))
+
+            const foodInLogId = Number(req.params.food_in_log_id);
+            const existing = await prismaClient.foodInLog.findUnique({
+                where: { id: foodInLogId },
+                include: { log: true }
+            })
+            if (!existing) return next(new ResponseError(404, "Food in log not found"))
+            if (existing.log.user_id !== user.id) return next(new ResponseError(403, "Forbidden"))
+
+            const request: FoodInLogCreateUpdateRequest = req.body as FoodInLogCreateUpdateRequest;
+            const response = await FoodInLogService.updateFoodInLog(foodInLogId, request);
+            res.status(200).json({
+                data: response,
+            });
         } catch (error) {
             next(error);
         }
     }
 
-    static async update(req: Request, res: Response, next: NextFunction) {
+    static async deleteFoodInLog(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id);
-            const result = await FoodInLogService.update(id, req.body);
-            res.status(200).json({ success: true, data: result });
-        } catch (error) {
-            next(error);
-        }
-    }
+            const user = req.user
+            if (!user) return next(new ResponseError(401, "Unauthorized"))
 
-    static async delete(req: Request, res: Response, next: NextFunction) {
-        try {
-            const id = parseInt(req.params.id);
-            await FoodInLogService.delete(id);
-            res.status(200).json({ success: true, message: "Food in log entry deleted" });
+            const foodInLogId = Number(req.params.food_in_log_id);
+            const existing = await prismaClient.foodInLog.findUnique({
+                where: { id: foodInLogId },
+                include: { log: true }
+            })
+            if (!existing) return next(new ResponseError(404, "Food in log not found"))
+            if (existing.log.user_id !== user.id) return next(new ResponseError(403, "Forbidden"))
+
+            const message = await FoodInLogService.deleteFoodInLog(foodInLogId);
+            res.status(200).json({
+                message: message,
+            });
         } catch (error) {
             next(error);
         }

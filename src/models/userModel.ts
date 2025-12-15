@@ -23,6 +23,7 @@ export interface LoginUserRequest {
 
 export interface UserResponse {
     token?: string
+    userId?: number
 }
 
 export interface UserDataDump {
@@ -72,6 +73,7 @@ export function toUserResponse(
                 email: email,
             },
             "1h"
-        )
+        ),
+        userId: id
     }
 }

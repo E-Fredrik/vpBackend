@@ -1,6 +1,13 @@
 import { z, ZodType } from "zod";
 
 export class FoodLogValidation {
+
+    static readonly FOOD_ITEM = z.object({
+        food_id: z.number().int().positive(),
+        quantity: z.number().int().positive(),
+        calories: z.number().min(0),
+    })
+    
     static readonly CREATE: ZodType = z.object({
         user_id: z.number().int().positive(),
         timestamp: z.number().int().positive(), // Unix timestamp in milliseconds

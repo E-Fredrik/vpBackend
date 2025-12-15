@@ -16,6 +16,17 @@ export class FoodService {
         return toFoodResponse(food)
     }
 
+    static async getFoodByName(name: string): Promise<FoodResponse[]> {
+        const foods = await prismaClient.food.findMany({
+            where: {
+                name: { contains: name,
+                    mode: 'insensitive',
+                },
+            },
+        })
+        return foods.map(toFoodResponse)
+    }
+
     static async checkFoodExist(
         foodId: number
     ): Promise<Food> {
