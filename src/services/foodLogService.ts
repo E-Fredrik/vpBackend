@@ -22,6 +22,16 @@ export interface UpdateFoodLogRequest {
 }
 
 export class FoodLogService {
+    static async getFoodLogsByUserAndDateRange(userId: number, startDate: string, endDate: string) {
+        const startTimestamp = Date.parse(startDate);
+        const endTimestamp = Date.parse(endDate);
+
+        if (isNaN(startTimestamp) || isNaN(endTimestamp)) {
+            throw new ResponseError(400, "Invalid date format");
+        }
+
+        return this.getByUserIdAndDateRange(userId, startTimestamp, endTimestamp);
+    }
     static async create(request: CreateFoodLogRequest) {
         const validatedData = Validation.validate(FoodLogValidation.CREATE, request);
 
