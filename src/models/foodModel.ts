@@ -18,3 +18,14 @@ export function toFoodResponse(
         calories: food.calories
     }
 }
+
+export function toFoodResponseList(food: Food[]): FoodResponse[] {
+    const result= food.map((f) => {
+        return {
+            id: f.food_id,
+            name: f.name,
+            calories: f.calories
+        }
+    })
+    return result
+}
