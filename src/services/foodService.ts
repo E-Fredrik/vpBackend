@@ -2,6 +2,7 @@ import {
     FoodCreateUpdateRequest,
     FoodResponse,
     toFoodResponse,
+    toFoodResponseList,
 } from './../models/foodModel'
 import { prismaClient } from '../utils/databaseUtil'
 import { Food } from '../../generated/prisma'
@@ -24,7 +25,7 @@ export class FoodService {
                 },
             },
         })
-        return foods.map(toFoodResponse)
+        return toFoodResponseList(foods)
     }
 
     static async checkFoodExist(
