@@ -16,7 +16,7 @@ publicRouter.get('/health', (req, res) => {
 });
 
 // User authentication (no token required)
-publicRouter.post("/register", UserController.register);
+publicRouter.post("/register", UserController.register); 
 publicRouter.post("/login", UserController.login);
 
 // Places (read-only, public access for browsing)

@@ -20,13 +20,13 @@ export class UserService {
             request
         )
 
-        const email = await prismaClient.user.findUnique({
-            where: { email: validatedData.email },
-        })
+        // const email = await prismaClient.user.findUnique({
+        //     where: { email: validatedData.email },
+        // })
         
-        if (email) {
-            throw new ResponseError(400, "Email already in use!")
-        }
+        // if (email) {
+        //     throw new ResponseError(400, "Email already in use!")
+        // }
 
         validatedData.password = await bcrypt.hash(
             validatedData.password,
