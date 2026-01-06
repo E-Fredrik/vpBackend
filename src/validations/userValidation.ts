@@ -11,19 +11,7 @@ export class UserValidation {
     })
 
     static readonly LOGIN: ZodType = z.object({
-        email: z
-            .email({
-                error: "Email format is invalid!",
-            })
-            .min(1, {
-                error: "Email can not be empty!",
-            }),
-        password: z
-            .string({
-                error: "Password must be string!",
-            })
-            .min(8, {
-                error: "Password must contain more than or equal to 8 characters!",
-            }),
+        email: z.string().email("Email format is invalid!").min(1, "Email can not be empty!"),
+        password: z.string().min(8, "Password must contain more than or equal to 8 characters!"),
     })
 }

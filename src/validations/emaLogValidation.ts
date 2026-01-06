@@ -1,32 +1,22 @@
 import { z, ZodType } from "zod";
 
-export class FoodLogValidation {
-
-    static readonly FOOD_ITEM = z.object({
-        food_id: z.number().int().positive(),
-        quantity: z.number().int().positive(),
-        calories: z.number().min(0),
-    })
-    
+export class EmaLogValidation {
     static readonly CREATE: ZodType = z.object({
         user_id: z.number().int().positive(),
+        moodScore: z.number().int().min(1).max(10),
+        context: z.string().max(500).optional(),
         timestamp: z.number().int().positive(), // Unix timestamp in milliseconds
         latitude: z.number().min(-90).max(90).optional(),
         longitude: z.number().min(-180).max(180).optional(),
-        foods: z
-            .array(
-                z.object({
-                    food_id: z.number().int().positive(),
-                    quantity: z.number().int().positive().optional(),
-                    calories: z.number().int().nonnegative().optional(),
-                })
-            )
-            .optional(),
+        geofenceRadius: z.number().int().positive().optional(),
     });
 
     static readonly UPDATE: ZodType = z.object({
+        moodScore: z.number().int().min(1).max(10).optional(),
+        context: z.string().max(500).optional(),
         timestamp: z.number().int().positive().optional(),
         latitude: z.number().min(-90).max(90).optional(),
         longitude: z.number().min(-180).max(180).optional(),
+        geofenceRadius: z.number().int().positive().optional(),
     });
 }

@@ -1,88 +1,189 @@
-import { FoodLogCreateUpdateRequest, FoodLogResponse, toFoodLogResponse } from "../models/foodLogModel"
-import { prismaClient } from "../utils/databaseUtil"
-import { Validation } from "../validations/validation"
-import { FoodLogValidation } from "../validations/foodLogValidation"
-import { ResponseError } from "../error/responseError"
+import { ResponseError } from "../error/responseError";
+import { prismaClient } from "../utils/databaseUtil";
+import { Validation } from "../validations/validation";
+import { FoodLogValidation } from "../validations/foodLogValidation";
+
+export interface CreateFoodLogRequest {
+    user_id: number;
+    timestamp: number; // Unix timestamp in milliseconds
+    latitude?: number;
+    longitude?: number;
+    foods?: Array<{
+        food_id: number;
+        quantity?: number;
+        calories?: number;
+    }>;
+}
+
+export interface UpdateFoodLogRequest {
+    timestamp?: number;
+    latitude?: number;
+    longitude?: number;
+}
 
 export class FoodLogService {
-    static async createFoodLog(request: FoodLogCreateUpdateRequest): Promise<FoodLogResponse> {
-        const validated = Validation.validate(FoodLogValidation.CREATE, request)
+    static async getFoodLogsByUserAndDateRange(userId: number, startDate: string, endDate: string) {
+        const startTimestamp = Date.parse(startDate);
+        const endTimestamp = Date.parse(endDate);
 
-        const user = await prismaClient.user.findUnique({ where: { user_id: validated.user_id } })
-        if (!user) {
-            throw new ResponseError(404, "User not found!")
+        if (isNaN(startTimestamp) || isNaN(endTimestamp)) {
+            throw new ResponseError(400, "Invalid date format");
         }
 
-        const created = await prismaClient.food_Log.create({
+        return this.getByUserIdAndDateRange(userId, startTimestamp, endTimestamp);
+    }
+    static async create(request: CreateFoodLogRequest) {
+        const validatedData = Validation.validate(FoodLogValidation.CREATE, request);
+
+        const user = await prismaClient.user.findUnique({
+            where: { user_id: validatedData.user_id },
+        });
+
+        if (!user) {
+            throw new ResponseError(404, "User not found");
+        }
+
+        // Create food log with associated food items
+        const createdLog = await prismaClient.food_Log.create({
             data: {
-                user_id: validated.user_id,
-                timestamp: BigInt(validated.timestamp),
-                latitude: validated.latitude ?? undefined,
-                longitude: validated.longitude ?? undefined,
+                user_id: validatedData.user_id,
+                timestamp: BigInt(validatedData.timestamp),
+                latitude: validatedData.latitude,
+                longitude: validatedData.longitude,
+                foodInLogs: validatedData.foods
+                    ? {
+                          create: validatedData.foods.map((f) => ({
+                              food_id: f.food_id,
+                              quantity: f.quantity,
+                              calories: f.calories,
+                          })),
+                      }
+                    : undefined,
+            },
+            include: {
                 foodInLogs: {
-                    create: validated.foods.map(f => ({
-                        food: { connect: { food_id: f.food_id } },
-                        quantity: f.quantity ?? undefined,
-                        calories: f.calories ?? undefined,
-                    })),
+                    include: {
+                        food: true,
+                    },
                 },
             },
-            include: { foodInLogs: { include: { food: true } } },
-        })
-        return toFoodLogResponse(created)
+        });
+
+        return this.serializeFoodLog(createdLog);
     }
 
-    static async getFoodLog(logId: number): Promise<FoodLogResponse> {
-        const existing = await prismaClient.food_Log.findUnique({
+    static async getById(logId: number) {
+        const log = await prismaClient.food_Log.findUnique({
             where: { log_id: logId },
-            include: { foodInLogs: { include: { food: true } } },
-        })
-        if (!existing) {
-            throw new ResponseError(404, "Food log not found!")
+            include: {
+                foodInLogs: {
+                    include: {
+                        food: true,
+                    },
+                },
+            },
+        });
+
+        if (!log) {
+            throw new ResponseError(404, "Food log not found");
         }
-        return toFoodLogResponse(existing)
+
+        return this.serializeFoodLog(log);
     }
 
-    static async updateFoodLog(logId: number, payload: Partial<Pick<FoodLogCreateUpdateRequest, "timestamp" | "latitude" | "longitude">>): Promise<FoodLogResponse> {
-        const validated = Validation.validate(FoodLogValidation.UPDATE, payload)
+    static async getByUserId(userId: number) {
+        const logs = await prismaClient.food_Log.findMany({
+            where: { user_id: userId },
+            include: {
+                foodInLogs: {
+                    include: {
+                        food: true,
+                    },
+                },
+            },
+            orderBy: { timestamp: "desc" },
+        });
+
+        return logs.map(this.serializeFoodLog);
+    }
+
+    static async getByUserIdAndDateRange(
+        userId: number,
+        startTimestamp: number,
+        endTimestamp: number
+    ) {
+        const logs = await prismaClient.food_Log.findMany({
+            where: {
+                user_id: userId,
+                timestamp: {
+                    gte: BigInt(startTimestamp),
+                    lte: BigInt(endTimestamp),
+                },
+            },
+            include: {
+                foodInLogs: {
+                    include: {
+                        food: true,
+                    },
+                },
+            },
+            orderBy: { timestamp: "desc" },
+        });
+
+        return logs.map(this.serializeFoodLog);
+    }
+
+    static async update(logId: number, request: UpdateFoodLogRequest) {
+        const validatedData = Validation.validate(FoodLogValidation.UPDATE, request);
 
         const existing = await prismaClient.food_Log.findUnique({
             where: { log_id: logId },
-            include: { foodInLogs: { include: { food: true } } },
-        })
+        });
+
         if (!existing) {
-            throw new ResponseError(404, "Food log not found!")
+            throw new ResponseError(404, "Food log not found");
         }
+
         const updated = await prismaClient.food_Log.update({
             where: { log_id: logId },
             data: {
-                timestamp: validated.timestamp ? BigInt(validated.timestamp) : undefined,
-                latitude: validated.latitude ?? undefined,
-                longitude: validated.longitude ?? undefined,
+                timestamp: validatedData.timestamp
+                    ? BigInt(validatedData.timestamp)
+                    : undefined,
+                latitude: validatedData.latitude,
+                longitude: validatedData.longitude,
             },
-            include: { foodInLogs: { include: { food: true } } },
-        })
-        return toFoodLogResponse(updated)
+            include: {
+                foodInLogs: {
+                    include: {
+                        food: true,
+                    },
+                },
+            },
+        });
+
+        return this.serializeFoodLog(updated);
     }
 
-    static async deleteFoodLog(logId: number): Promise<string> {
+    static async delete(logId: number) {
         const existing = await prismaClient.food_Log.findUnique({
             where: { log_id: logId },
-        })
+        });
+
         if (!existing) {
-            throw new ResponseError(404, "Food log not found!")
+            throw new ResponseError(404, "Food log not found");
         }
-        await prismaClient.food_Log.delete({
+
+        return prismaClient.food_Log.delete({
             where: { log_id: logId },
-        })
-        return "Food log deleted successfully."
+        });
     }
 
-    static async getFoodLogsByUser(userId: number): Promise<FoodLogResponse[]> {
-        const existingLogs = await prismaClient.food_Log.findMany({
-            where: { user_id: userId },
-            include: { foodInLogs: { include: { food: true } } },
-        })
-        return existingLogs.map(log => toFoodLogResponse(log))
+    // Helper to convert BigInt to number for JSON serialization
+    private static serializeFoodLog(log: any) {
+        return {
+            ...log,
+            timestamp: Number(log.timestamp),
+        };
     }
 }

@@ -26,6 +26,40 @@ export interface UserResponse {
     userId?: number
 }
 
+export interface UserDataDump {
+    userId: number;
+    username: string;
+    email: string;
+    bmiGoal: number;
+    weight: number;
+    height: number;
+    dailySummaries: any[];
+    foodLogs: any[];
+    activityLogs: any[];
+    visitLogs: any[];
+    emaLogs: any[];
+}
+
+export interface UserProfileResponse {
+    userId: number
+    username: string
+    email: string
+    weight: number
+    height: number
+    bmi: number
+    bmiGoal: number
+    memberSince: Date
+    recentFoodLogs: {
+        logId: number
+        timestamp: number
+        foods: {
+            foodName: string
+            calories: number
+            quantity: number
+        }[]
+    }[]
+}
+
 export function toUserResponse(
     id: number,
     username: string,

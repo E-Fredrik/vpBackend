@@ -7,6 +7,19 @@ import { Validation } from "../validations/validation";
 import { FoodInLogValidation } from "../validations/foodInLogValidation";
 import { ResponseError } from "../error/responseError";
 
+
+export interface CreateFoodInLogRequest {
+    log_id: number;
+    food_id: number;
+    quantity?: number;
+    calories?: number;
+}
+
+export interface UpdateFoodInLogRequest {
+    quantity?: number;
+    calories?: number;
+}
+
 export class FoodInLogService {
 	static async createFoodInLog(
 		request: FoodInLogCreateUpdateRequest
