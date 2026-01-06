@@ -5,6 +5,16 @@ import { FoodController } from "../controllers/foodController";
 
 export const publicRouter = express.Router();
 
+// Health check endpoint
+publicRouter.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
 // User authentication (no token required)
 publicRouter.post("/register", UserController.register);
 publicRouter.post("/login", UserController.login);
