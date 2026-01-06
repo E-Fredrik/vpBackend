@@ -44,17 +44,22 @@ export class FoodService {
 
     static async createFood(
         request: FoodCreateUpdateRequest,
-    ): Promise<string> {
+    ): Promise<FoodResponse> {
         const validatedData = Validation.validate(
             FoodValidation.CREATE, request
         )
-        await prismaClient.food.create({
+        for (const existingFood of await prismaClient.food.findMany({
+            where: { name: validatedData.name },
+        })) {
+            throw new ResponseError(409, `Food with name '${existingFood.name}' already exists!`)
+        }
+        const createdFood = await prismaClient.food.create({
             data: {
                 name: validatedData.name,
                 calories: validatedData.calories,
             },
         })
-        return "Food created successfully!"
+        return toFoodResponse(createdFood)
     }
 
     static async updateFood(
